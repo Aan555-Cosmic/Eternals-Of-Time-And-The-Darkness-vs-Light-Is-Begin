@@ -1,0 +1,24 @@
+if game.PlaceId == 6403373529 then
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))()
+local Window = OrionLib:MakeWindow({Name = "Eternals Hub||SlapBattles🖐", HidePremium = false, IntroEnabled = true, IntroText = SlapBattles🖐,IntroIcon = https://images.app.goo.gl/AxzMGyrMXXeey5hL8, Icon = https://images.app.goo.gl/AxzMGyrMXXeey5hL8, CloseCallback = true, SaveConfig = true, ConfigFolder = "Eternals Hub"})
+
+local FirstTab = Window:MakeTab({
+	Name = "Introduce",
+	Icon = "122849166302746",
+	PremiumOnly = false
+})
+
+FirstTab:AddLabel("This Sc Alr 15%")
+
+
+OrionLib:MakeNotification({
+	Name = "Executed!",
+	Content = "U Executed The Script!!!",
+	Image = "rbxassetid://4483345998",
+	Time = 5
+})
+
+
+    
+end
+OrionLib:Init()
