@@ -1,24 +1,165 @@
-if game.PlaceId == 6403373529 then
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))()
-local Window = OrionLib:MakeWindow({Name = "Eternals Hub||SlapBattles🖐", HidePremium = false, IntroEnabled = true, IntroText = SlapBattles🖐,IntroIcon = https://images.app.goo.gl/AxzMGyrMXXeey5hL8, Icon = https://images.app.goo.gl/AxzMGyrMXXeey5hL8, CloseCallback = true, SaveConfig = true, ConfigFolder = "Eternals Hub"})
+local CustomUILib = {}
 
-local FirstTab = Window:MakeTab({
-	Name = "Introduce",
-	Icon = "122849166302746",
-	PremiumOnly = false
-})
+local UserInputService = game:GetService("UserInputService")
 
-FirstTab:AddLabel("This Sc Alr 15%")
+-- Buat UI Utama
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game:GetService("CoreGui")
 
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 300, 0, 400)
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
 
-OrionLib:MakeNotification({
-	Name = "Executed!",
-	Content = "U Executed The Script!!!",
-	Image = "rbxassetid://4483345998",
-	Time = 5
-})
+-- Tombol Close & Floating Icon
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0, 50, 0, 30)
+CloseButton.Position = UDim2.new(1, -55, 0, 5)
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+CloseButton.Text = "X"
+CloseButton.Parent = MainFrame
 
+local FloatingIcon = Instance.new("TextButton")
+FloatingIcon.Size = UDim2.new(0, 50, 0, 50)
+FloatingIcon.Position = UDim2.new(0, 10, 0.5, -25)
+FloatingIcon.BackgroundColor3 = Color3.fromRGB(50, 50, 255)
+FloatingIcon.Text = "📌"
+FloatingIcon.Visible = false
+FloatingIcon.Parent = ScreenGui
 
-    
+CloseButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    FloatingIcon.Visible = true
+end)
+
+FloatingIcon.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    FloatingIcon.Visible = false
+end)
+
+-- Fungsi untuk membuat Tab
+function CustomUILib:CreateTab(name)
+    local Tab = Instance.new("Frame")
+    Tab.Size = UDim2.new(1, 0, 0, 40)
+    Tab.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    Tab.Parent = MainFrame
+
+    local Title = Instance.new("TextLabel")
+    Title.Size = UDim2.new(1, 0, 1, 0)
+    Title.BackgroundTransparency = 1
+    Title.Text = name
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.Parent = Tab
+
+    return Tab
 end
-OrionLib:Init()
+
+-- Fungsi untuk menambah tombol
+function CustomUILib:CreateButton(tab, text, callback)
+    local Button = Instance.new("TextButton")
+    Button.Size = UDim2.new(1, 0, 0, 30)
+    Button.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    Button.Text = text
+    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Button.Parent = tab
+
+    Button.MouseButton1Click:Connect(callback)
+end
+
+-- Fungsi untuk Toggle (ON/OFF)
+function CustomUILib:CreateToggle(tab, text, callback)
+    local Toggle = Instance.new("TextButton")
+    Toggle.Size = UDim2.new(1, 0, 0, 30)
+    Toggle.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    Toggle.Text = text .. " [OFF]"
+    Toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Toggle.Parent = tab
+
+    local State = false
+    Toggle.MouseButton1Click:Connect(function()
+        State = not State
+        Toggle.Text = text .. (State and " [ON]" or " [OFF]")
+        callback(State)
+    end)
+end
+
+-- Fungsi untuk Slider
+function CustomUILib:CreateSlider(tab, text, min, max, callback)
+    local SliderFrame = Instance.new("Frame")
+    SliderFrame.Size = UDim2.new(1, 0, 0, 50)
+    SliderFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    SliderFrame.Parent = tab
+
+    local Label = Instance.new("TextLabel")
+    Label.Size = UDim2.new(1, 0, 0, 25)
+    Label.BackgroundTransparency = 1
+    Label.Text = text .. ": " .. min
+    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Label.Parent = SliderFrame
+
+    local Slider = Instance.new("TextButton")
+    Slider.Size = UDim2.new(1, 0, 0, 25)
+    Slider.Position = UDim2.new(0, 0, 0.5, 0)
+    Slider.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    Slider.Text = "Drag"
+    Slider.Parent = SliderFrame
+
+    local Dragging = false
+    Slider.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            Dragging = true
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            Dragging = false
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if Dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local MousePos = input.Position.X
+            local SliderPos = math.clamp(MousePos - SliderFrame.AbsolutePosition.X, 0, SliderFrame.AbsoluteSize.X)
+            local Value = math.floor(min + ((SliderPos / SliderFrame.AbsoluteSize.X) * (max - min)))
+            Label.Text = text .. ": " .. Value
+            callback(Value)
+        end
+    end)
+end
+
+-- Fungsi untuk Dropdown
+function CustomUILib:CreateDropdown(tab, text, options, callback)
+    local Dropdown = Instance.new("TextButton")
+    Dropdown.Size = UDim2.new(1, 0, 0, 30)
+    Dropdown.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    Dropdown.Text = text .. " ▼"
+    Dropdown.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Dropdown.Parent = tab
+
+    local Open = false
+    Dropdown.MouseButton1Click:Connect(function()
+        Open = not Open
+        Dropdown.Text = text .. (Open and " ▲" or " ▼")
+        callback(options)
+    end)
+end
+
+-- Fungsi untuk Notifikasi
+function CustomUILib:Notify(message)
+    local Notification = Instance.new("TextLabel")
+    Notification.Size = UDim2.new(0, 200, 0, 50)
+    Notification.Position = UDim2.new(0.5, -100, 0.1, 0)
+    Notification.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    Notification.Text = message
+    Notification.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Notification.Parent = ScreenGui
+
+    task.wait(3)
+    Notification:Destroy()
+end
+
+return CustomUILib
